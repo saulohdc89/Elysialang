@@ -1,7 +1,7 @@
 package lexico
 
 import (
-	"github.com/saulohdc89/PROJETOCOMPIL/himekolang/token"
+	"github.com/saulohdc89/PROJETOCOMPIL/elysialang/token"
 )
 
 type Lexico struct {

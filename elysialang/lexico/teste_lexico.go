@@ -3,7 +3,7 @@ package lexico
 import (
 	"testing"
 
-	"himekolang/token"
+	"github.com/saulohdc89/PROJETOCOMPIL/elysialang/token"
 )
 
 func TesteProximoToken(t *testing.T) {
