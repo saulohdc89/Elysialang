@@ -1,14 +1,16 @@
 package lexico
 
 import (
-	"github.com/saulohdc89/PROJETOCOMPIL/elysialang/token"
+	"fmt"
+
+	"Elysialang/token"
 )
 
 type Lexico struct {
-	entrada    string
-	posicao    int  // atual posição na entrada
-	lerPosicao int  // posição atual de leitura na entrada (após o char atual)
-	ch         byte // atual char
+	entrada    string //Texto a ser recebido
+	posicao    int    // posição atual
+	lerPosicao int    // posição atual + 1
+	ch         byte   // caractere atual
 }
 
 func Novo(entrada string) *Lexico {
@@ -40,10 +42,10 @@ func (l *Lexico) ProxToken() token.Token {
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
-		if isLetra(l.ch) {
+		if ehLetra(l.ch) {
 			tok.Literal = l.lerIdentificador()
 			return tok
-		} else if isDigito(l.ch) {
+		} else if ehDigito(l.ch) {
 			tok.Type = token.INT
 			tok.Literal = l.lerNumero()
 			return tok
@@ -70,12 +72,54 @@ func novoToken(tokenType token.TokenType, ch byte) token.Token {
 
 func (l *Lexico) lerIdentificador() string {
 	posicao := l.posicao
-	for isLetra(l.ch) {
+	for ehLetra(l.ch) {
 		l.lerChar()
 	}
 	return l.entrada[posicao:l.posicao]
 }
 
-func isLetra(ch byte) bool {
+func ehDigito(ch byte) bool {
+	return '0' <= ch && ch <= '9' || ch == '.'
+}
+
+func ehLetra(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
+var keywords = map[string]TokenType{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
+func VerIdent(ident string) TokenType {
+	if tok, ok := keywords[ident]; ok {
+		return tok
+	}
+	return IDENT
+}
+
+func (l *Lexico) lerNumero() string {
+	prim_posicao := l.posicao
+	var numero string
+	var pos_meio int
+	var eu_tenho_dot bool
+
+	for ehDigito(l.ch) {
+		if l.ch == '.' {
+			numero = l.entrada[prim_posicao:l.posicao]
+			numero = fmt.Sprintf("%s", numero)
+			pos_meio = l.posicao
+			eu_tenho_dot = true
+		}
+		l.lerChar()
+	}
+
+	floatin := fmt.Sprintf("%s%s", numero, l.entrada[pos_meio:l.posicao])
+
+	if eu_tenho_dot {
+		return floatin
+	} else {
+		return l.entrada[prim_posicao:l.posicao]
+	}
+
 }
